@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjpowernode.mapper.UserMapper">
+
+    <!--/**-->
+    <!--* url	/user/selectUserPage?userName=z&userSex=男&page=null-->
+    <!--* 参数	userName:表单中用户名称-->
+    <!--* userSex:表单中用户性别-->
+    <!--* page:提交的页码(第一次访问为null)-->
+    <!--* 结果	有数据时：-->
+    <!--* [{-->
+    <!--* "userId":"15968954638794962",-->
+    <!--* "cardType":"身份证","-->
+    <!--* cardNo":"343343554654",-->
+    <!--* "userName":"撒撒旦",-->
+    <!--* "userSex":"女",-->
+    <!--* "userAge":"29",-->
+    <!--* "userRole":"生产、运输设备操作人员及有关人员"},-->
+    <!--* {….}-->
+    <!--* ]-->
+    <!--* 无数据时：-->
+    <!--* []-->
+    <!--*/-->
+    <!--List<User>selectUserPage(-->
+    <!--@Param("userName")-->
+    <!--String userName,-->
+    <!--@Param("userSex")-->
+    <!--String userSex-->
+    <!--);-->
+    <resultMap id="usermap" type="user">
+        <id property="userId" column="user_id"></id>
+        <result property="cardType" column="card_type"></result>
+        <result property="cardNo" column="card_no"></result>
+        <result property="userName" column="user_name"></result>
+        <result property="userSex" column="user_sex"></result>
+        <result property="userAge" column="user_age"></result>
+        <result property="userRole" column="user_role"></result>
+    </resultMap>
+    <sql id="allColumns">
+        user_id,card_type,card_no,user_name,user_sex,user_age,user_role
+    </sql>
+    <select id="selectUserPage" resultMap="usermap">
+        select <include refid="allColumns"></include>
+        from user
+        <where>
+            <if test="userName != null and userName != ''">
+                and user_name like concat('%',#{userName},'%')
+            </if>
+            <if test="userSex != null and userSex != ''">
+                and user_sex = #{userSex}
+            </if>
+        </where>
+    </select>
+
+    <!--/**-->
+    <!--* url	/user/getRowCount?userName=z&userSex=男-->
+    <!--* 参数	userName:表单中用户名称-->
+    <!--* userSex:表单中用户性别-->
+    <!--* 结果	有数据时:-->
+    <!--* 12-->
+    <!--* 无数据时:-->
+    <!--* 0-->
+    <!--*/-->
+    <!--int getRowCount(@Param("userName")-->
+    <!--String userName,-->
+    <!--@Param("userSex")-->
+    <!--String userSex);-->
+    <select id="getRowCount" resultType="int">
+        select count(user_id) from user
+        <where>
+            <if test="userName != null and userName != ''">
+                and user_name like concat('%',#{userName},'%')
+            </if>
+            <if test="userSex != null and userSex != ''">
+                and user_sex = #{userSex}
+            </if>
+        </where>
+    </select>
+
+    <!--/**-->
+    <!--* url	/user/deleteUserById?userId= 15968162087363060-->
+    <!--* 参数	userId:删除用户的id-->
+    <!--* 结果	删除成功时：-->
+    <!--* 1-->
+    <!--* 删除失败时:-->
+    <!--* 0-->
+    <!--*/-->
+    <!--int deleteUserById(String userId);-->
+    <delete id="deleteUserById" parameterType="string">
+        delete from user where user_id = #{userId}
+    </delete>
+
+
+    <!--/**-->
+    <!--* url	/user/createUser(参数见下面)-->
+    <!--* 参数	cardType: this.ruleForm.cardType,//证件类型-->
+    <!--* cardNo: this.ruleForm.cardNo,//证件号码-->
+    <!--* userName: this.ruleForm.userName,//用户姓名-->
+    <!--* userSex: this.ruleForm.userSex,//用户性别-->
+    <!--* userAge: this.ruleForm.userAge,//用户年龄-->
+    <!--* userRole: this.ruleForm.userRole,//用户角色-->
+    <!--* 结果	增加成功时：-->
+    <!--* 1-->
+    <!--* 增加失败时:-->
+    <!--* 0-->
+    <!--*/-->
+    <!--int createUser(User user);-->
+    <insert id="createUser" parameterType="user">
+        insert into user values (#{userId},#{cardType},#{cardNo},#{userName},#{userSex},#{userAge},#{userRole})
+    </insert>
+
+    <!--/**-->
+    <!--* url	/user/updateUserById(参数见以下)-->
+    <!--* 参数	userId: this.ruleForm.userId,//用户 Id-->
+    <!--* cardType: this.ruleForm.cardType,//证件类型-->
+    <!--* cardNo: this.ruleForm.cardNo,//证件号码-->
+    <!--* userName: this.ruleForm.userName,//用户姓名-->
+    <!--* userSex: this.ruleForm.userSex,//用户性别-->
+    <!--* userAge: this.ruleForm.userAge,//用户年龄-->
+    <!--* userRole: this.ruleForm.userRole,//用户角色-->
+    <!--* 结果	成功时：-->
+    <!--* 1-->
+    <!--* 出错时：-->
+    <!--* 0-->
+    <!--*/-->
+    <!--int updateUserById(User user);-->
+    <update id="updateUserById" parameterType="user">
+        update user
+        <set>
+            <if test="cardType != null and cardType != ''">
+                card_type = #{cardType},
+            </if>
+            <if test="cardNo != null and cardNo != ''">
+                card_no = #{cardNo},
+            </if>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="userSex != null and userSex != ''">
+                 user_sex = #{userSex},
+            </if>
+            <if test="userAge != null">
+                user_age = #{userAge},
+            </if>
+            <if test="userRole != null and userRole != ''">
+                user_role = #{userRole},
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <!--/**-->
+    <!--* url	/user/deleteUserByIdList-->
+    <!--* 参数	String: userIdList-->
+    <!--* 结果	成功时：-->
+    <!--* 3-->
+    <!--* 出错时：-->
+    <!--* 0-->
+    <!--*/-->
+    <!--int deleteUserByIdList(List userIds);-->
+    <delete id="deleteUserByIdList" parameterType="list">
+        delete from user
+        where user_id in
+        <foreach collection="list" item="userId" separator="," open="(" close=")">
+            #{userId}
+        </foreach>
+    </delete>
+</mapper>
